@@ -41,6 +41,7 @@ app.use('/api/media', mediaRoutes); // Ensure media routes are correctly referen
 
 // Server listener
 const PORT = process.env.PORT || 5000; // Port fallback for flexibility
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

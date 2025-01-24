@@ -10,7 +10,7 @@ const RetrieveMedia = () => {
   const fetchMedia = async () => {
     try {
       setLoading(true); // Show loading indicator while fetching
-      const response = await axios.get('http://192.168.8.169:5000/api/media/getmedia');
+      const response = await axios.get('https://yfcapp.onrender.com/api/media/getmedia');
       setMediaData(response.data);
     } catch (error) {
       console.error('Error fetching media:', error);

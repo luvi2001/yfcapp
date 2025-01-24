@@ -10,7 +10,7 @@ const NoticeListScreen = () => {
     const fetchNotices = async () => {
         try {
             setLoading(true); // Show loading indicator while fetching
-            const response = await axios.get('http://192.168.8.169:5000/api/notice/get');
+            const response = await axios.get('https://yfcapp.onrender.com/api/notice/get');
             setNotices(response.data);
         } catch (error) {
             console.error('Error fetching notices:', error);

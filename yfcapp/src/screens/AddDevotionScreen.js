@@ -15,7 +15,7 @@ const AddDevotionScreen = ({ navigation }) => {
         const fetchUserDetails = async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
-                const response = await axios.get('http://192.168.8.169:5000/api/devotion/profile', {
+                const response = await axios.get('https://yfcapp.onrender.com/api/devotion/profile', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setName(response.data.name); // Fetch user's name
@@ -23,7 +23,7 @@ const AddDevotionScreen = ({ navigation }) => {
                 setDate(currentDate); // Set current date
 
                 // Check if the user has already submitted devotion for today
-                const devotionResponse = await axios.get(`http://192.168.8.169:5000/api/devotion/check?userId=${response.data._id}&date=${currentDate}`, {
+                const devotionResponse = await axios.get(`https://yfcapp.onrender.com/api/devotion/check?userId=${response.data._id}&date=${currentDate}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -51,7 +51,7 @@ const AddDevotionScreen = ({ navigation }) => {
         try {
             const token = await AsyncStorage.getItem('token');
             const response = await axios.post(
-                'http://192.168.8.169:5000/api/devotion/add',
+                'https://yfcapp.onrender.com/api/devotion/add',
                 {
                     name,
                     date,

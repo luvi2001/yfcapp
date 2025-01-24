@@ -1,42 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For storing JWT
 
-const LoginScreen = ({ navigation }) => {
+const AdminLoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Handle login function
-    const handleLogin = async () => {
-        if (!email || !password) {
-            Alert.alert('Error', 'Please enter both email and password.');
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            // Send login request to your backend
-            const response = await axios.post('https://yfcapp.onrender.com/api/auth/login', {
-                email,
-                password,
-            });
-
-            const { token, user } = response.data; // Assuming response contains JWT and user details
-
-            // Store token in AsyncStorage
-            await AsyncStorage.setItem('token', token);
-
-            // Redirect to the Home screen and pass the user's name as a parameter
-            navigation.navigate('MainTabs', { userName: user.name });
-
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Error', 'Login failed. Please try again.');
-        } finally {
-            setLoading(false);
+    // Handle admin login
+    const handleAdminLogin = () => {
+        if (email === 'admin@gmail.com' && password === 'admin123') {
+            Alert.alert('Success', 'Welcome, Admin!');
+            navigation.navigate('AdminNav'); // Replace with your Admin Dashboard screen
+        } else {
+            Alert.alert('Error', 'Invalid email or password.');
         }
     };
 
@@ -48,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.overlay}>
                 {/* Logo Image */}
                 <Image source={require('../assets/sm.jpg')} style={styles.logo} />
-                <Text style={styles.title}>Welcome Back!</Text>
+                <Text style={styles.title}>Admin Login</Text>
 
                 <View style={styles.formContainer}>
                     <TextInput
@@ -69,19 +45,16 @@ const LoginScreen = ({ navigation }) => {
                         secureTextEntry
                         autoCapitalize="none"
                     />
-                    <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+                    <TouchableOpacity style={styles.button} onPress={handleAdminLogin} disabled={loading}>
                         <Text style={styles.buttonText}>
                             {loading ? 'Logging In...' : 'Login'}
                         </Text>
                     </TouchableOpacity>
                 </View>
 
-                {/* Sign-Up Link */}
-                <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                    <Text style={styles.signUpLink}>Don't have an account? Sign Up</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('AdminLogin')}>
-                    <Text style={styles.signUpLink}>Admin Login</Text>
+                {/* Back to User Login */}
+                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                    <Text style={styles.signUpLink}>Back to User Login</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -123,7 +96,7 @@ const styles = StyleSheet.create({
         textShadowRadius: 4,
     },
     formContainer: {
-        width: '200',
+        width: '90%',
         padding: 20,
         borderRadius: 15,
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -135,7 +108,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     input: {
-        width: '140',
+        width: '100%',
         padding: 12,
         marginBottom: 15,
         borderWidth: 1,
@@ -168,4 +141,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LoginScreen;
+export default AdminLoginScreen;

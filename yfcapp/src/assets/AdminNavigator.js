@@ -1,19 +1,15 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons'; // Make sure to install expo/vector-icons
-import AddDevotionScreen from '../screens/AddDevotionScreen';
 import HomeScreen from '../screens/HomeScreen';
-import AddBibleStudyScreen from '../screens/AddBibleStudyScreen';
 import NoticeAddScreen from '../screens/NoticeAddScreen';
-import NoticeListScreen from '../screens/NoticeListScreen';
 import RsourceLibraryScreen from '../screens/RsourceLibraryScreen';
-import RetrieveMedia from '../screens/RetriveMedia';
 
 
 const Tab = createBottomTabNavigator();
 
-const BottomTabNavigator = ({ route }) => {
-  const { hotelowner } = route.params;  // Get email from navigation params
+const BottomTabNavigatorAdmin = ({ route }) => {
+  
 
   return (
     <Tab.Navigator
@@ -68,33 +64,20 @@ const BottomTabNavigator = ({ route }) => {
       
       />
       <Tab.Screen 
-        name="AddDevotion" 
-        component={AddDevotionScreen} 
+        name="Addnotice" 
+        component={NoticeAddScreen}
         options={{ headerShown: false }} 
-      />
-
-      <Tab.Screen 
-        name="AddBibleStudy" 
-        component={AddBibleStudyScreen} 
-        options={{ headerShown: false }} 
-      />
-
-      <Tab.Screen 
-        name="Getnotices" 
-        component={NoticeListScreen} 
-        options={{ headerShown: false }} 
-      />
-
-
-
-      <Tab.Screen 
-        name="Media" 
-        component={RetrieveMedia} 
-        options={{ headerShown: false }} 
-      />
       
+      />
+
+     <Tab.Screen 
+        name="Library" 
+        component={RsourceLibraryScreen}
+        options={{ headerShown: false }} 
+      
+      />
     </Tab.Navigator>
   );
 };
 
-export default BottomTabNavigator;
+export default BottomTabNavigatorAdmin;

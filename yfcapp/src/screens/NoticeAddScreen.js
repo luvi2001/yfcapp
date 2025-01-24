@@ -16,7 +16,7 @@ const NoticeAddScreen = ({ navigation }) => {
         try {
             setLoading(true);
 
-            const response = await axios.post('http://192.168.8.169:5000/api/notice/add', {
+            const response = await axios.post('https://yfcapp.onrender.com/api/notice/add', {
                 heading,
                 description,
             });

@@ -12,6 +12,10 @@ import NoticeAddScreen from './src/screens/NoticeAddScreen';
 import NoticeListScreen from './src/screens/NoticeListScreen';
 import RsourceLibraryScreen from './src/screens/RsourceLibraryScreen';
 import RetrieveMedia from './src/screens/RetriveMedia';
+import AdminLoginScreen from './src/screens/AdminLoginScreen';
+import BottomTabNavigatorAdmin from './src/assets/AdminNavigator';
+
+
 // Create the stack navigator
 const Stack = createStackNavigator();
 
@@ -34,6 +38,8 @@ export default function App() {
         <Stack.Screen name="Getnotice" component={NoticeListScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Library" component={RsourceLibraryScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Media" component={RetrieveMedia} options={{ headerShown: false }}/>
+        <Stack.Screen name="AdminLogin" component={AdminLoginScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="AdminNav" component={BottomTabNavigatorAdmin} options={{ headerShown: false }}/>
 
       </Stack.Navigator>
     </NavigationContainer>

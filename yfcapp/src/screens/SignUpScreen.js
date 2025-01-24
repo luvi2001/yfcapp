@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import {
+    View,
+    Text,
+    TextInput,
+    StyleSheet,
+    TouchableOpacity,
+    Alert,
+    Image,
+    ScrollView,
+    Dimensions,
+    Platform,
+} from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 const SignUpScreen = ({ navigation }) => {
     const [name, setName] = useState('');
@@ -9,14 +22,12 @@ const SignUpScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    // Handle sign up
     const handleSignUp = async () => {
         if (!name || !email || !phone || !division || !username || !password) {
             Alert.alert('Error', 'Please fill in all the fields.');
             return;
         }
 
-        // Create the user data object
         const userData = {
             name,
             email,
@@ -27,8 +38,7 @@ const SignUpScreen = ({ navigation }) => {
         };
 
         try {
-            // Make API request to sign up the user
-            const response = await fetch('http://192.168.8.169:5000/api/auth/signup', {
+            const response = await fetch('https://yfcapp.onrender.com/api/auth/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,7 +50,7 @@ const SignUpScreen = ({ navigation }) => {
 
             if (response.ok) {
                 Alert.alert('Success', data.message);
-                navigation.navigate('Login'); // Navigate to the login screen after successful signup
+                navigation.navigate('Login');
             } else {
                 Alert.alert('Error', data.message || 'Something went wrong');
             }
@@ -51,88 +61,89 @@ const SignUpScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            {/* Background Image with Proper Scaling */}
-            <Image source={require('../assets/ck.jpg')} style={styles.backgroundImage} />
-            
-            <View style={styles.overlay}>
-                {/* Logo Image */}
-                <Image source={require('../assets/sm.jpg')} style={styles.logo} />
-                <Text style={styles.title}>Create an Account</Text>
-                
-                <View style={styles.formContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Full Name"
-                        placeholderTextColor="#999"
-                        value={name}
-                        onChangeText={setName}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email"
-                        placeholderTextColor="#999"
-                        value={email}
-                        onChangeText={setEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Phone Number"
-                        placeholderTextColor="#999"
-                        value={phone}
-                        onChangeText={setPhone}
-                        keyboardType="phone-pad"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Area"
-                        placeholderTextColor="#999"
-                        value={division}
-                        onChangeText={setDivision}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Username"
-                        placeholderTextColor="#999"
-                        value={username}
-                        onChangeText={setUsername}
-                        autoCapitalize="none"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Password"
-                        placeholderTextColor="#999"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                        autoCapitalize="none"
-                    />
-                    <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                        <Text style={styles.buttonText}>Sign Up</Text>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.container}>
+                <Image source={require('../assets/ck.jpg')} style={styles.backgroundImage} />
+
+                <View style={styles.overlay}>
+                    <Image source={require('../assets/sm.jpg')} style={styles.logo} />
+                    <Text style={styles.title}>Create an Account</Text>
+
+                    <View style={styles.formContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Full Name"
+                            placeholderTextColor="#999"
+                            value={name}
+                            onChangeText={setName}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Email"
+                            placeholderTextColor="#999"
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Phone Number"
+                            placeholderTextColor="#999"
+                            value={phone}
+                            onChangeText={setPhone}
+                            keyboardType="phone-pad"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Area"
+                            placeholderTextColor="#999"
+                            value={division}
+                            onChangeText={setDivision}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Username"
+                            placeholderTextColor="#999"
+                            value={username}
+                            onChangeText={setUsername}
+                            autoCapitalize="none"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Password"
+                            placeholderTextColor="#999"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                            autoCapitalize="none"
+                        />
+                        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                            <Text style={styles.buttonText}>Sign Up</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                        <Text style={styles.signUpLink}>Already have an account? Login</Text>
                     </TouchableOpacity>
                 </View>
-
-                {/* Link to Login */}
-                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.signUpLink}>Already have an account? Login</Text>
-                </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
+    scrollContainer: {
+        flexGrow: 1,
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        minHeight: height,
     },
     backgroundImage: {
         ...StyleSheet.absoluteFillObject,
-        width: '100%',
-        height: '100%',
         resizeMode: 'cover',
         opacity: 0.6,
     },
@@ -140,39 +151,39 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: width * 0.04,  // Dynamic padding
     },
     logo: {
-        width: 180,
-        height: 120,
-        marginBottom: 40,
+        width: width * 0.5,
+        height: height * 0.18,  // Adjusted for better responsiveness
+        marginBottom: height * 0.03,
     },
     title: {
-        fontSize: 36,
+        fontSize: width * 0.07,
         fontWeight: 'bold',
         color: '#fff',
-        marginBottom: 40,
+        marginBottom: height * 0.02,
         textAlign: 'center',
         textShadowColor: '#000',
         textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 4,
+        textShadowRadius: 3,
     },
     formContainer: {
-        width: '100%',
-        padding: 20,
+        width: '90%',
+        padding: width * 0.05,
         borderRadius: 15,
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 4,
     },
     input: {
-        width: '200',
-        padding: 12,
-        marginBottom: 15,
+        width: '100%',
+        padding: height * 0.015,
+        marginBottom: height * 0.015,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 30,
@@ -180,27 +191,26 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#ff0d4f',
-        paddingVertical: 15,
+        paddingVertical: height * 0.015,
         borderRadius: 30,
-        width: '140',
+        width: '70%',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        shadowRadius: 3.5,
         elevation: 5,
     },
     buttonText: {
-        fontSize: 18,
+        fontSize: width * 0.045,
         fontWeight: 'bold',
         color: '#fff',
     },
     signUpLink: {
-        marginTop: 20,
-        fontSize: 16,
+        marginTop: height * 0.02,
+        fontSize: width * 0.038,
         color: '#fff',
         textDecorationLine: 'underline',
     },
 });
-
 export default SignUpScreen;

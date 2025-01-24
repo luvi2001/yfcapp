@@ -16,7 +16,7 @@ const AddBibleStudyScreen = () => {
     }
     try {
       const response = await axios.post(
-        'http://192.168.8.169:5000/api/bstudy/bible-study/start',
+        'https://yfcapp.onrender.com/api/bstudy/bible-study/start',
         { conductor, location }
       );
       setStudyId(response.data.id);
@@ -34,7 +34,7 @@ const AddBibleStudyScreen = () => {
       return;
     }
     try {
-      await axios.post(`http://192.168.8.169:5000/api/bstudy/bible-study/end/${studyId}`);
+      await axios.post(`https://yfcapp.onrender.com/api/bstudy/bible-study/end/${studyId}`);
       setIsLive(false);
       setStudyId(null);
       setMessage('');

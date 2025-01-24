@@ -41,7 +41,7 @@ export default function UploadMedia() {
         videoLink,
       };
 
-      const response = await axios.post('http://192.168.8.169:5000/api/media/upload', data, {
+      const response = await axios.post('https://yfcapp.onrender.com/api/media/upload', data, {
         headers: {
           'Content-Type': 'application/json',
         },
