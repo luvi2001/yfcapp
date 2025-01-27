@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     input: {
-        width: '100%',
+        width: '150',
         padding: height * 0.015,
         marginBottom: height * 0.015,
         borderWidth: 1,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff0d4f',
         paddingVertical: height * 0.015,
         borderRadius: 30,
-        width: '70%',
+        width: '150',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

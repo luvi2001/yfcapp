@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     input: {
-        width: '100%',
+        width: '200',
         padding: 12,
         marginBottom: 15,
         borderWidth: 1,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff0d4f',
         paddingVertical: 15,
         borderRadius: 30,
-        width: '100%',
+        width: '200',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

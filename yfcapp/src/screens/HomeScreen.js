@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert, Dimensions, TouchableOpacity, Modal, FlatList, ScrollView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import {jwtDecode} from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 import { PieChart } from 'react-native-chart-kit';
 
