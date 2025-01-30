@@ -5,8 +5,8 @@ const { uploadMedia,getMedia } = require('../controllers/librarycontroller');  /
 
 // Middleware to parse JSON and handle large Base64 strings (up to 50mb)
 const bodyParser = require('body-parser');
-router.use(bodyParser.json({ limit: '50mb' }));  // For handling base64 images
-router.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+router.use(bodyParser.json({ limit: '1000mb' }));  // For handling base64 images
+router.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // Route to handle media upload
 router.post('/upload', uploadMedia);
