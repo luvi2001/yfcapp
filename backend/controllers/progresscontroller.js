@@ -7,7 +7,8 @@ const getWeeklyStats = async (req, res) => {
     if (!startDate || !endDate) {
       return res.status(400).json({ message: "Start date and end date are required." });
     }
-
+    console.log("Received Start Date:", startDate);
+    console.log("Received End Date:", endDate);
     const start = new Date(startDate);
     start.setUTCHours(0, 0, 0, 0);
     const end = new Date(endDate);
