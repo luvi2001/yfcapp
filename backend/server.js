@@ -11,6 +11,7 @@ const devotionRoutes = require('./routes/devotionroutes');
 const biblestudyRoutes = require('./routes/biblestudyroutes');
 const noticeRoutes = require('./routes/noticeroutes');
 const mediaRoutes = require('./routes/mediaroutes'); // Ensure this is the correct path
+const progressRoutes = require('./routes/progressroutes'); // Ensure this is the correct path
 
 // Middleware
 app.use(express.json({ limit: '100mb' })); 
@@ -40,6 +41,8 @@ app.use('/api/devotion', devotionRoutes);
 app.use('/api/bstudy', biblestudyRoutes);
 app.use('/api/notice', noticeRoutes);
 app.use('/api/media', mediaRoutes); // Ensure media routes are correctly referenced
+app.use('/api/progress', progressRoutes);
+
 
 // Server listener
 const PORT = process.env.PORT || 5000; // Port fallback for flexibility

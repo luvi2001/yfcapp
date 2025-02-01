@@ -42,4 +42,35 @@ const getMedia = async (req, res) => {
   };
 
 
-module.exports = { uploadMedia,getMedia };
+const deleteMedia = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const media = await Media.findByIdAndDelete(id);
+    if (!media) return res.status(404).json({ message: 'Media not found' });
+
+    res.json({ message: 'Media deleted successfully!' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting media' });
+  }
+};
+
+const updateMedia = async (req, res) => {
+  const { id } = req.params;
+  const { title, photo, videoLink } = req.body;
+
+  if (!title || !photo || !videoLink) {
+    return res.status(400).json({ message: 'All fields are required to update.' });
+  }
+
+  try {
+    const media = await Media.findByIdAndUpdate(id, { title, photo, videoLink }, { new: true });
+    if (!media) {
+      return res.status(404).json({ message: 'Media not found.' });
+    }
+    res.status(200).json({ message: 'Media updated successfully!', media });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update media' });
+  }
+};
+
+module.exports = { uploadMedia,getMedia,deleteMedia,updateMedia };

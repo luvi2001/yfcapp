@@ -55,41 +55,40 @@ const getOngoingBibleStudies = async (req, res) => {
     }
 };
 
-// Get details of a specific Bible study by ID
-const getBibleStudyDetails = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const bibleStudy = await BibleStudy.findById(id);
-        if (!bibleStudy) {
-            return res.status(404).json({ success: false, message: 'Bible study not found.' });
-        }
-        res.status(200).json({ success: true, data: bibleStudy });
-    } catch (error) {
-        console.error('Error fetching Bible study details:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch Bible study details.' });
-    }
+
+// Fetch unique conductor names
+const getConductors = async (req, res) => {
+  try {
+    const conductors = await BibleStudy.distinct('conductor');
+    console.log('Distinct Conductors:', conductors);  // Log the conductors
+    res.status(200).json(conductors);
+  } catch (error) {
+    console.error('Error fetching conductors:', error);
+    res.status(500).json({ message: 'Error fetching conductors', error });
+  }
 };
 
-// Update the status of a Bible study
-const updateBibleStudyStatus = async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
 
-    try {
-        const updatedBibleStudy = await BibleStudy.findByIdAndUpdate(
-            id,
-            { status },
-            { new: true }
-        );
-
-        if (!updatedBibleStudy) {
-            return res.status(404).json({ success: false, message: 'Bible study not found.' });
-        }
-
-        res.status(200).json({ success: true, data: updatedBibleStudy });
-    } catch (error) {
-        console.error('Error updating Bible study status:', error);
-        res.status(500).json({ success: false, message: 'Failed to update Bible study status.' });
+const getBibleStudies = async (req, res) => {
+  try {
+    const { conductor, startDate, endDate } = req.query;
+    
+    const filter = {};
+    
+    if (conductor && conductor !== 'all') {
+      filter.conductor = conductor;
     }
+
+    if (startDate && endDate) {
+      filter.startTime = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
+    const studies = await BibleStudy.find(filter);
+    res.status(200).json(studies);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching Bible studies', error });
+  }
 };
-module.exports = {startBibleStudy,endBibleStudy,updateBibleStudyStatus,getBibleStudyDetails,getOngoingBibleStudies};
+
+
+module.exports = {startBibleStudy,endBibleStudy,getOngoingBibleStudies,getConductors,getBibleStudies};
