@@ -1,10 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons'; // Make sure to install expo/vector-icons
-import HomeScreen from '../screens/HomeScreen';
+import AdminHomeScreen from '../screens/AdminHomeScreen';
 import NoticeAddScreen from '../screens/NoticeAddScreen';
 import RsourceLibraryScreen from '../screens/RsourceLibraryScreen';
-
+import AdminRetreiveMediScreen from '../screens/AdminRetreiveMediaScreen';
+import DevotionSearchScreen from '../screens/DevotionDetails';
+//import AdminDashboard from '../screens/ProgressScree';
+import BibleStudyScreen from '../screens/GetBibleStudyDetails';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,23 +33,27 @@ const BottomTabNavigatorAdmin = ({ route }) => {
           let iconName;
 
           switch (route.name) {
-            case 'Home':
-              iconName = focused ? 'home' : 'home-outline'; // Home tab
+            case 'AdminHome':
+              iconName = focused ? 'home' : 'home-outline'; 
               break;
-            case 'AddDevotion':
-              iconName = focused ? 'add-circle' : 'add-circle-outline'; // Add Food tab
+            case 'Devotion':
+              iconName = focused ? 'hourglass' : 'hourglass-outline'; 
               break;
               
-            case 'AddBibleStudy':
-              iconName = focused ? 'book' : 'book-outline'; // Add Food tab
+            case 'AddMedia':
+              iconName = focused ? 'add-circle' : 'add-circle-outline'; 
               break;
 
-            case 'Media':
-                iconName = focused ? 'library' : 'library-outline'; // Add Food tab
+            case 'Medias':
+                iconName = focused ? 'library' : 'library-outline';
                 break;
 
-            case 'Getnotices':
-                iconName = focused ? 'notifications' : 'notifications-sharp'; // Add Food tab
+            case 'Addnotice':
+                iconName = focused ? 'notifications' : 'notifications-sharp'; 
+                break;
+
+            case 'BStudy':
+                iconName = focused ? 'book' : 'book-sharp'; 
                 break;
   
 
@@ -58,8 +65,8 @@ const BottomTabNavigatorAdmin = ({ route }) => {
       })}
     >
       <Tab.Screen 
-        name="Home" 
-        component={HomeScreen}
+        name="AdminHome" 
+        component={AdminHomeScreen}
         options={{ headerShown: false }} 
       
       />
@@ -71,11 +78,33 @@ const BottomTabNavigatorAdmin = ({ route }) => {
       />
 
      <Tab.Screen 
-        name="Library" 
+        name="AddMedia" 
         component={RsourceLibraryScreen}
         options={{ headerShown: false }} 
       
       />
+
+      <Tab.Screen 
+        name="Medias" 
+        component={AdminRetreiveMediScreen}
+        options={{ headerShown: false }} 
+      
+      />
+
+      <Tab.Screen 
+        name="Devotion" 
+        component={DevotionSearchScreen}
+        options={{ headerShown: false }} 
+      
+      />
+      
+      <Tab.Screen 
+        name="BStudy" 
+        component={BibleStudyScreen}
+        options={{ headerShown: false }} 
+      
+      />
+
     </Tab.Navigator>
   );
 };

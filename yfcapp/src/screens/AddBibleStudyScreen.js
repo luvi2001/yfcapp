@@ -1,15 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddBibleStudyScreen = () => {
   const [conductor, setConductor] = useState('');
   const [location, setLocation] = useState('');
-  const [studyId, setStudyId] = useState(null); // For tracking ongoing study
+  const [studyId, setStudyId] = useState(null);
   const [isLive, setIsLive] = useState(false);
-  const [message, setMessage] = useState(''); // For live status messages
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const loadStudySession = async () => {
+      const storedStudyId = await AsyncStorage.getItem('studyId');
+      const storedIsLive = await AsyncStorage.getItem('isLive');
+      if (storedStudyId && storedIsLive === 'true') {
+        setStudyId(storedStudyId);
+        setIsLive(true);
+        setMessage('Going live...');
+      }
+    };
+    loadStudySession();
+  }, []);
 
   const startMeeting = async () => {
+    if (isLive) {
+      Alert.alert('Error', 'A Bible study is already live. End the current study first.');
+      return;
+    }
     if (!conductor || !location) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -19,9 +37,12 @@ const AddBibleStudyScreen = () => {
         'https://yfcapp.onrender.com/api/bstudy/bible-study/start',
         { conductor, location }
       );
-      setStudyId(response.data.id);
+      const newStudyId = response.data.id;
+      setStudyId(newStudyId);
       setIsLive(true);
       setMessage('Going live...');
+      await AsyncStorage.setItem('studyId', newStudyId);
+      await AsyncStorage.setItem('isLive', 'true');
       Alert.alert('Success', 'Bible study started!');
     } catch (error) {
       Alert.alert('Error', 'Could not start the Bible study');
@@ -40,6 +61,8 @@ const AddBibleStudyScreen = () => {
       setMessage('');
       setConductor('');
       setLocation('');
+      await AsyncStorage.removeItem('studyId');
+      await AsyncStorage.removeItem('isLive');
       Alert.alert('Success', 'Bible study ended!');
     } catch (error) {
       Alert.alert('Error', 'Could not end the Bible study');
@@ -83,26 +106,26 @@ const AddBibleStudyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center', // Center the content vertically
-    alignItems: 'center', // Center the content horizontally
-    backgroundColor: '#f9e3b1', // Light background for better aesthetics
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9e3b1',
     padding: 20,
   },
   form: {
     width: '90%',
-    backgroundColor: '#fff', // White background for the form
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
-    elevation: 5, // Adds shadow for Android
+    elevation: 5,
   },
   label: {
     fontSize: 16,
     marginBottom: 8,
-    color: '#333', // Darker text color for better readability
+    color: '#333',
     fontWeight: 'bold',
   },
   input: {
@@ -121,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   button: {
-    backgroundColor: '#ff0d4f', // Bright red button color
+    backgroundColor: '#ff0d4f',
     padding: 12,
     borderRadius: 5,
     alignItems: 'center',

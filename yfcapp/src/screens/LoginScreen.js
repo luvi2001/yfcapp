@@ -81,7 +81,7 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.signUpLink}>Don't have an account? Sign Up</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('AdminLogin')}>
-                    <Text style={styles.signUpLink}>Admin Login</Text>
+                    <Text style={styles.signUpLink}>Admin Login.</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     input: {
-        width: '140',
+        width: '100%',
         padding: 12,
         marginBottom: 15,
         borderWidth: 1,

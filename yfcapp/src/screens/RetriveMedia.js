@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, FlatList, Image, Linking, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, FlatList, Image, Linking, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -9,17 +9,21 @@ const RetrieveMedia = () => {
 
   const fetchMedia = async () => {
     try {
-      setLoading(true); // Show loading indicator while fetching
+      setLoading(true);
       const response = await axios.get('https://yfcapp.onrender.com/api/media/getmedia');
-      setMediaData(response.data);
+      
+      // Sort media by createdAt (assuming ISO date format)
+      const sortedMedia = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      setMediaData(sortedMedia);
     } catch (error) {
       console.error('Error fetching media:', error);
       Alert.alert('Error', 'Failed to fetch media.');
     } finally {
-      setLoading(false); // Hide loading indicator
+      setLoading(false);
     }
   };
-
+  
   useFocusEffect(
     useCallback(() => {
       fetchMedia();
@@ -50,29 +54,35 @@ const RetrieveMedia = () => {
     );
   }
 
-  if (mediaData.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No media available.</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Uploaded Media</Text>
-      <FlatList
-        data={mediaData}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={renderItem}
-        numColumns={2} // Display media in two columns
-        contentContainerStyle={styles.listContent}
-      />
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Uploaded Media</Text>
+        {mediaData.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No media available.</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={mediaData}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={renderItem}
+            numColumns={2}
+            contentContainerStyle={styles.listContent}
+            scrollEnabled={false} // Disabling FlatList scrolling to allow ScrollView to handle it
+          />
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    backgroundColor: '#f9e3b1',
+    paddingBottom: 16,
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -83,7 +93,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    marginTop:50,
+    marginTop: 50,
   },
   listContent: {
     paddingBottom: 16,
@@ -93,8 +103,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     margin: 8,
-    flex: 1, // To ensure items are evenly distributed
-    maxWidth: '48%', // To allow spacing between columns
+    flex: 1,
+    maxWidth: '48%',
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -106,6 +116,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 8,
     color: '#333',
+    textAlign: 'center',
   },
   image: {
     width: 150,
