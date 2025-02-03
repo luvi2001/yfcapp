@@ -12,12 +12,14 @@ const getWeeklyProgress = async (req, res) => {
             return res.status(400).json({ error: 'Username is required' });
         }
 
-        const lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek').toDate(); // Ensure proper Date format
-        const lastWeekEnd = moment().subtract(1, 'weeks').endOf('isoWeek').toDate();
+        // Get start and end of the last week, including the time
+        const lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek').startOf('day').toDate(); // Exact datetime start of the week
+        const lastWeekEnd = moment().subtract(1, 'weeks').endOf('isoWeek').endOf('day').toDate();   // Exact datetime end of the week
 
         console.log(`Fetching progress for user: ${userName}`);
         console.log(`Week Start: ${lastWeekStart}, Week End: ${lastWeekEnd}`);
 
+        // Use $gte (greater than or equal) and $lte (less than or equal) for the range
         const progress = await WeeklyProgress.findOne({
             userName,
             weekStart: { $gte: lastWeekStart },
@@ -37,6 +39,7 @@ const getWeeklyProgress = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
+
 
 
 
