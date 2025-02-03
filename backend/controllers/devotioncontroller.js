@@ -14,7 +14,9 @@ const getWeeklyProgress = async (req, res) => {
   
       const lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek').format('YYYY-MM-DD');
       const lastWeekEnd = moment().subtract(1, 'weeks').endOf('isoWeek').format('YYYY-MM-DD');
-  
+      console.log(userName);
+      console.log(lastWeekStart);
+      console.log(lastWeekEnd);
       const progress = await WeeklyProgress.findOne({
         userName,
         weekStart: lastWeekStart,
