@@ -22,6 +22,7 @@ const getWeeklyProgress = async (req, res) => {
         weekStart: lastWeekStart,
         weekEnd: lastWeekEnd,
       });
+      console.log(progress);
   
       if (!progress) {
         return res.status(404).json({ message: 'No progress found for last week' });
