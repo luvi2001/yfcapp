@@ -6,34 +6,39 @@ const WeeklyProgress = require('../models/weeklyprogresssmodel');
 
 const getWeeklyProgress = async (req, res) => {
     try {
-      const { userName } = req.params;
-  
-      if (!userName) {
-        return res.status(400).json({ error: 'Username is required' });
-      }
-  
-      const lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek').format('YYYY-MM-DD');
-      const lastWeekEnd = moment().subtract(1, 'weeks').endOf('isoWeek').format('YYYY-MM-DD');
-      console.log(userName);
-      console.log(lastWeekStart);
-      console.log(lastWeekEnd);
-      const progress = await WeeklyProgress.findOne({
-        userName,
-        weekStart: lastWeekStart,
-        weekEnd: lastWeekEnd,
-      });
-      console.log(progress);
-  
-      if (!progress) {
-        return res.status(404).json({ message: 'No progress found for last week' });
-      }
-  
-      res.status(200).json(progress);
+        const { userName } = req.params;
+
+        if (!userName) {
+            return res.status(400).json({ error: 'Username is required' });
+        }
+
+        const lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek').toDate(); // Ensure proper Date format
+        const lastWeekEnd = moment().subtract(1, 'weeks').endOf('isoWeek').toDate();
+
+        console.log(`Fetching progress for user: ${userName}`);
+        console.log(`Week Start: ${lastWeekStart}, Week End: ${lastWeekEnd}`);
+
+        const progress = await WeeklyProgress.findOne({
+            userName,
+            weekStart: { $gte: lastWeekStart },
+            weekEnd: { $lte: lastWeekEnd },
+        });
+
+        console.log('Progress found:', progress);
+
+        if (!progress) {
+            return res.status(200).json({ available: false, message: 'No submission for last week' });
+        }
+
+        res.status(200).json({ available: true, progress });
+
     } catch (error) {
-      console.error('Error fetching weekly progress:', error);
-      res.status(500).json({ error: 'Server error' });
+        console.error('Error fetching weekly progress:', error);
+        res.status(500).json({ error: 'Server error' });
     }
-  };
+};
+
+
 
 // Submit Weekly Progress (Only allowed on Mondays for the previous week)
 const submitProgress = async (req, res) => {
