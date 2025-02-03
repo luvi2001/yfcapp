@@ -4,7 +4,33 @@ const User = require('../models/usermodel'); // Assuming User model is used for 
 const moment = require('moment');
 const WeeklyProgress = require('../models/weeklyprogresssmodel');
 
-
+const getWeeklyProgress = async (req, res) => {
+    try {
+      const { userName } = req.params;
+  
+      if (!userName) {
+        return res.status(400).json({ error: 'Username is required' });
+      }
+  
+      const lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek').format('YYYY-MM-DD');
+      const lastWeekEnd = moment().subtract(1, 'weeks').endOf('isoWeek').format('YYYY-MM-DD');
+  
+      const progress = await WeeklyProgress.findOne({
+        userName,
+        weekStart: lastWeekStart,
+        weekEnd: lastWeekEnd,
+      });
+  
+      if (!progress) {
+        return res.status(404).json({ message: 'No progress found for last week' });
+      }
+  
+      res.status(200).json(progress);
+    } catch (error) {
+      console.error('Error fetching weekly progress:', error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  };
 
 // Submit Weekly Progress (Only allowed on Mondays for the previous week)
 const submitProgress = async (req, res) => {
@@ -191,4 +217,4 @@ const checkDevotionByDate = async (req, res) => {
 };
 
 
-module.exports = { createDevotion, getDevotions,getUserProfile,checkDevotionByDate,getDevotionStats,getUserDevotions,submitProgress };
+module.exports = { createDevotion, getDevotions,getUserProfile,checkDevotionByDate,getWeeklyProgress,getUserDevotions,submitProgress };
