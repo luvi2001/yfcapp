@@ -7,14 +7,12 @@ const getWeeklyStats = async (req, res) => {
     if (!startDate || !endDate) {
       return res.status(400).json({ message: "Start date and end date are required." });
     }
-    console.log("Received Start Date:", startDate);
-    console.log("Received End Date:", endDate);
+
     const start = new Date(startDate);
     start.setUTCHours(0, 0, 0, 0);
     const end = new Date(endDate);
     end.setUTCHours(23, 59, 59, 999);
-    console.log(start);
-    console.log(end);
+
     const reports = await WeeklyProgress.find({
       weekStart: { $gte: start },
       weekEnd: { $lte: end }
@@ -22,7 +20,7 @@ const getWeeklyStats = async (req, res) => {
 
     const requiredReports = 15;
     const maxDevotionMarks = requiredReports * 7;
-    const maxTotalMarks = requiredReports * 10; // Total max marks for the team
+    const maxTotalMarks = requiredReports * 10;
 
     let totalDevotionMarks = 0;
     let totalMarksGained = 0;
@@ -30,12 +28,15 @@ const getWeeklyStats = async (req, res) => {
     let wentToChurchCount = 0;
     let attendedBibleStudiesCount = 0;
 
+    const userNames = [];
+
     reports.forEach(report => {
       totalDevotionMarks += report.devotionDays;
       totalMarksGained += report.marks;
       if (report.metDisciple === 'yes') metDiscipleCount++;
       if (report.wentToChurch === 'yes') wentToChurchCount++;
       if (report.attendedBibleStudies === 'yes') attendedBibleStudiesCount++;
+      userNames.push(report.userName);
     });
 
     const devotionPercentage = ((totalDevotionMarks / maxDevotionMarks) * 100).toFixed(2);
@@ -43,7 +44,7 @@ const getWeeklyStats = async (req, res) => {
     const wentToChurchPercentage = ((wentToChurchCount / requiredReports) * 100).toFixed(2);
     const attendedBibleStudiesPercentage = ((attendedBibleStudiesCount / requiredReports) * 100).toFixed(2);
     const teamTotalPercentage = ((totalMarksGained / maxTotalMarks) * 100).toFixed(2);
-    console.log(teamTotalPercentage);
+
     res.status(200).json({
       totalReports: reports.length,
       maxDevotionMarks,
@@ -53,6 +54,7 @@ const getWeeklyStats = async (req, res) => {
       wentToChurchPercentage,
       attendedBibleStudiesPercentage,
       teamTotalPercentage,
+      submittedBy: userNames, // list of names who submitted reports
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
