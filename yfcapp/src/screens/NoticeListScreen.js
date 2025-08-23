@@ -6,17 +6,19 @@ import { useFocusEffect } from '@react-navigation/native';
 const NoticeListScreen = () => {
     const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false); // New state for pull-to-refresh
 
     const fetchNotices = async () => {
         try {
-            setLoading(true); // Show loading indicator while fetching
+            if (!refreshing) setLoading(true); // Only show loading spinner when not refreshing
             const response = await axios.get('https://yfcapp.onrender.com/api/notice/get');
             setNotices(response.data);
         } catch (error) {
             console.error('Error fetching notices:', error);
             Alert.alert('Error', 'Failed to fetch notices.');
         } finally {
-            setLoading(false); // Hide loading indicator
+            setLoading(false);
+            setRefreshing(false); // End refreshing
         }
     };
 
@@ -26,7 +28,12 @@ const NoticeListScreen = () => {
         }, [])
     );
 
-    if (loading) {
+    const handleRefresh = () => {
+        setRefreshing(true);
+        fetchNotices();
+    };
+
+    if (loading && !refreshing) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff" />
@@ -57,8 +64,10 @@ const NoticeListScreen = () => {
                         </Text>
                     </View>
                 )}
-                numColumns={2} // Display notices in two columns
+                numColumns={2}
                 contentContainerStyle={styles.listContent}
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
             />
         </View>
     );
@@ -75,7 +84,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 16,
         textAlign: 'center',
-        marginTop:30,
+        marginTop: 30,
     },
     listContent: {
         paddingBottom: 16,
@@ -85,8 +94,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 12,
         margin: 8,
-        flex: 1, // To ensure items are evenly distributed
-        maxWidth: '48%', // To allow spacing between columns
+        flex: 1,
+        maxWidth: '48%',
         elevation: 2,
         shadowColor: '#000',
         shadowOpacity: 0.1,

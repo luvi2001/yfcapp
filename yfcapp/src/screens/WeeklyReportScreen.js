@@ -15,7 +15,9 @@ const WeeklyProgressScreen = () => {
   const [userName, setUserName] = useState('');
   const [isMonday, setIsMonday] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [availableForSubmission, setAvailableForSubmission] = useState(true);
 
+  // Fetch user data once when the component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -29,16 +31,26 @@ const WeeklyProgressScreen = () => {
       }
     };
 
+    fetchUserData();
+  }, []);
+
+  // Fetch progress only when userName is set
+  useEffect(() => {
     const checkSubmissionDay = async () => {
+      if (!userName) return; // Ensure username is set before making the request
+
       const today = moment().isoWeekday(); // 1 (Monday) to 7 (Sunday)
       setIsMonday(today === 1);
 
       if (today === 1) {
-        // Fetch previous week's progress
         try {
-          const response = await axios.get(`http://localhost:5000/api/devotion/weeklyProgress/${userName}`);
-          if (response.data) {
-            setHasSubmitted(true);
+          const response = await axios.get(`https://yfcapp.onrender.com/api/devotion/weeklyProgress/${userName}`);
+          
+          // If no progress exists for the previous week, allow submission
+          if (response.data && response.data.available === false) {
+            setAvailableForSubmission(true); // Disallow submission if progress exists
+          } else {
+            setHasSubmitted(true); // If data exists, user has already submitted progress
           }
         } catch (error) {
           console.error('Error fetching progress:', error);
@@ -46,7 +58,6 @@ const WeeklyProgressScreen = () => {
       }
     };
 
-    fetchUserData();
     checkSubmissionDay();
   }, [userName]);
 
@@ -64,7 +75,7 @@ const WeeklyProgressScreen = () => {
       return;
     }
 
-    if (hasSubmitted) {
+    if (!availableForSubmission) {
       Alert.alert('Error', 'You have already submitted progress for last week.');
       return;
     }
@@ -85,8 +96,9 @@ const WeeklyProgressScreen = () => {
     };
 
     try {
-      await axios.post('http://localhost:5000/api/devotion/weeklyProgress', data);
+      await axios.post('https://yfcapp.onrender.com/api/devotion/weeklyProgress', data);
       setHasSubmitted(true);
+      setAvailableForSubmission(false); // Disallow future submissions for the same week
       Alert.alert('Success', 'Progress Submitted Successfully!');
     } catch (error) {
       console.error(error);
@@ -103,6 +115,8 @@ const WeeklyProgressScreen = () => {
         <Text style={styles.warning}>You can submit your progress only on Mondays.</Text>
       ) : hasSubmitted ? (
         <Text style={styles.warning}>You have already submitted your progress for last week.</Text>
+      ) : !availableForSubmission ? (
+        <Text style={styles.warning}>You cannot submit progress for last week as it is already submitted.</Text>
       ) : (
         <>
           <Text style={styles.label}>Number of days devotion done:</Text>

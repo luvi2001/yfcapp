@@ -47,7 +47,7 @@ const AdminRetrieveMediaScreen = () => {
           text: "Delete",
           onPress: async () => {
             try {
-              await axios.delete(`http://192.168.8.169:5000/api/media/delete/${id}`);
+              await axios.delete(`https://yfcapp.onrender.com/api/media/delete/${id}`);
               fetchMedia();
               Alert.alert("Success", "Media deleted successfully!");
             } catch (error) {
@@ -70,7 +70,7 @@ const AdminRetrieveMediaScreen = () => {
     const { _id, title, photo, videoLink } = editData;
     const imageToUpdate = newImage || photo; // Use new image if selected, otherwise use the existing one
     try {
-      const response = await axios.put(`http://192.168.8.169:5000/api/media/update/${_id}`, { title, photo: imageToUpdate, videoLink });
+      const response = await axios.put(`https://yfcapp.onrender.com/api/media/update/${_id}`, { title, photo: imageToUpdate, videoLink });
       fetchMedia();
       setEditMode(false);
       Alert.alert("Success", "Media updated successfully!");

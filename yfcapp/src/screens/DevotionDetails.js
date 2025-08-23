@@ -18,7 +18,7 @@ const DevotionSearchScreen = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get(`http://192.168.8.169:5000/api/auth/users`);
+                const response = await axios.get(`https://yfcapp.onrender.com/api/auth/users`);
                 setUsers(response.data);
             } catch (error) {
                 console.error('Error fetching users:', error);
@@ -29,7 +29,7 @@ const DevotionSearchScreen = () => {
 
     const fetchDevotions = async () => {
         try {
-            const response = await axios.get(`http://192.168.8.169:5000/api/devotion/search`, {
+            const response = await axios.get(`https://yfcapp.onrender.com/api/devotion/search`, {
                 params: { 
                     name: selectedUser, 
                     startDate: startDate.toISOString().split('T')[0], 

@@ -9,7 +9,6 @@ import {
     Image,
     ScrollView,
     Dimensions,
-    Platform,
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -21,10 +20,16 @@ const SignUpScreen = ({ navigation }) => {
     const [division, setDivision] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [reenterPassword, setReenterPassword] = useState('');
 
     const handleSignUp = async () => {
-        if (!name || !email || !phone || !division || !username || !password) {
+        if (!name || !email || !phone || !division || !username || !password || !reenterPassword) {
             Alert.alert('Error', 'Please fill in all the fields.');
+            return;
+        }
+
+        if (password !== reenterPassword) {
+            Alert.alert('Error', 'Passwords do not match.');
             return;
         }
 
@@ -76,6 +81,7 @@ const SignUpScreen = ({ navigation }) => {
                             placeholderTextColor="#999"
                             value={name}
                             onChangeText={setName}
+                            allowFontScaling={false}
                         />
                         <TextInput
                             style={styles.input}
@@ -85,6 +91,7 @@ const SignUpScreen = ({ navigation }) => {
                             onChangeText={setEmail}
                             keyboardType="email-address"
                             autoCapitalize="none"
+                            allowFontScaling={false}
                         />
                         <TextInput
                             style={styles.input}
@@ -93,6 +100,7 @@ const SignUpScreen = ({ navigation }) => {
                             value={phone}
                             onChangeText={setPhone}
                             keyboardType="phone-pad"
+                            allowFontScaling={false}
                         />
                         <TextInput
                             style={styles.input}
@@ -100,6 +108,7 @@ const SignUpScreen = ({ navigation }) => {
                             placeholderTextColor="#999"
                             value={division}
                             onChangeText={setDivision}
+                            allowFontScaling={false}
                         />
                         <TextInput
                             style={styles.input}
@@ -108,6 +117,7 @@ const SignUpScreen = ({ navigation }) => {
                             value={username}
                             onChangeText={setUsername}
                             autoCapitalize="none"
+                            allowFontScaling={false}
                         />
                         <TextInput
                             style={styles.input}
@@ -117,6 +127,17 @@ const SignUpScreen = ({ navigation }) => {
                             onChangeText={setPassword}
                             secureTextEntry
                             autoCapitalize="none"
+                            allowFontScaling={false}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Re-enter Password"
+                            placeholderTextColor="#999"
+                            value={reenterPassword}
+                            onChangeText={setReenterPassword}
+                            secureTextEntry
+                            autoCapitalize="none"
+                            allowFontScaling={false}
                         />
                         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
                             <Text style={styles.buttonText}>Sign Up</Text>
@@ -151,11 +172,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: width * 0.04,  // Dynamic padding
+        paddingHorizontal: width * 0.04,
     },
     logo: {
         width: width * 0.5,
-        height: height * 0.18,  // Adjusted for better responsiveness
+        height: height * 0.18,
         marginBottom: height * 0.03,
     },
     title: {
@@ -181,9 +202,10 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     input: {
-        width: '150',
-        padding: height * 0.015,
-        marginBottom: height * 0.015,
+        width: '100%',  // Ensures full width of the container
+        paddingVertical: height * 0.015, // Same padding for all fields
+        paddingHorizontal: width * 0.04, // Ensure horizontal padding
+        marginBottom: height * 0.015,  // Same margin for all inputs
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 30,
@@ -193,7 +215,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff0d4f',
         paddingVertical: height * 0.015,
         borderRadius: 30,
-        width: '150',
+        width: '100%',
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -212,5 +234,8 @@ const styles = StyleSheet.create({
         color: '#fff',
         textDecorationLine: 'underline',
     },
+
+
 });
+
 export default SignUpScreen;

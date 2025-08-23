@@ -1,34 +1,39 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, FlatList, Image, Linking, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, FlatList, Image, Linking, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 
 const RetrieveMedia = () => {
   const [mediaData, setMediaData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // pull-to-refresh state
 
   const fetchMedia = async () => {
     try {
-      setLoading(true);
+      if (!refreshing) setLoading(true);
       const response = await axios.get('https://yfcapp.onrender.com/api/media/getmedia');
-      
-      // Sort media by createdAt (assuming ISO date format)
+
       const sortedMedia = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
       setMediaData(sortedMedia);
     } catch (error) {
       console.error('Error fetching media:', error);
       Alert.alert('Error', 'Failed to fetch media.');
     } finally {
       setLoading(false);
+      setRefreshing(false); // end refreshing
     }
   };
-  
+
   useFocusEffect(
     useCallback(() => {
       fetchMedia();
     }, [])
   );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchMedia();
+  };
 
   const openLink = (url) => {
     if (url) {
@@ -46,7 +51,7 @@ const RetrieveMedia = () => {
     </View>
   );
 
-  if (loading) {
+  if (loading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -55,34 +60,28 @@ const RetrieveMedia = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Uploaded Media</Text>
-        {mediaData.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No media available.</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={mediaData}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={renderItem}
-            numColumns={2}
-            contentContainerStyle={styles.listContent}
-            scrollEnabled={false} // Disabling FlatList scrolling to allow ScrollView to handle it
-          />
-        )}
-      </View>
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Uploaded Media</Text>
+      {mediaData.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No media available.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={mediaData}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderItem}
+          numColumns={2}
+          contentContainerStyle={styles.listContent}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    backgroundColor: '#f9e3b1',
-    paddingBottom: 16,
-  },
   container: {
     flex: 1,
     padding: 16,

@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, Dimensions, TouchableOpacity, Modal, FlatList, ScrollView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  ScrollView,
+  Image,
+  RefreshControl,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { jwtDecode } from 'jwt-decode';
@@ -8,7 +21,7 @@ import { PieChart } from 'react-native-chart-kit';
 import Svg, { LinearGradient, Stop } from 'react-native-svg';
 
 // Import images from assets
-import image1 from '../assets/image1.jpg';  // Replace with your image file paths
+import image1 from '../assets/image1.jpg';
 import image2 from '../assets/image2.jpg';
 import image3 from '../assets/image3.jpg';
 
@@ -20,26 +33,23 @@ const HomeScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width - 40);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const images = [image1, image2, image3];  // Use the imported images here
+  const images = [image1, image2, image3];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
-    }, 5000); // Change image every 5 seconds
-
-    return () => clearInterval(interval); // Clear interval on component unmount
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const onChange = () => {
-      setScreenWidth(Dimensions.get('window').width - 40); // Update screen width on dimension change
+      setScreenWidth(Dimensions.get('window').width - 40);
     };
-  
     const subscription = Dimensions.addEventListener('change', onChange);
-    return () => {
-      subscription.remove(); // Use remove() instead of removeEventListener
-    };
+    return () => subscription.remove();
   }, []);
 
   const fetchUserNameFromToken = async () => {
@@ -61,9 +71,19 @@ const HomeScreen = ({ navigation }) => {
       const submittedPercentage = ((submittedToday / totalUsers) * 100).toFixed(2);
       const notSubmittedPercentage = (100 - submittedPercentage).toFixed(2);
 
-      setSubmissionData([ 
-        { name: 'Submitted', count: submittedToday, percentage: submittedPercentage, color: '#4CAF50' }, 
-        { name: 'NotSubmitted', count: totalUsers - submittedToday, percentage: notSubmittedPercentage, color: '#FF5722' },
+      setSubmissionData([
+        {
+          name: 'Submitted',
+          count: submittedToday,
+          percentage: submittedPercentage,
+          color: '#4CAF50',
+        },
+        {
+          name: 'NotSubmitted',
+          count: totalUsers - submittedToday,
+          percentage: notSubmittedPercentage,
+          color: '#FF5722',
+        },
       ]);
     } catch (error) {
       console.error('Error fetching submission data:', error);
@@ -81,20 +101,44 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const fetchAllData = async () => {
+    await fetchUserNameFromToken();
+    await fetchSubmissionData();
+    await fetchLiveStudies();
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       const initializeScreen = async () => {
         setLoading(true);
-        await fetchUserNameFromToken();
-        await fetchSubmissionData();
-        await fetchLiveStudies();
+        await fetchAllData();
         setLoading(false);
       };
       initializeScreen();
     }, [])
   );
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchAllData();
+    setRefreshing(false);
+  };
+
   const handleLiveStudiesClick = () => setModalVisible(true);
+
+  const handleLogout = async () => {
+    Alert.alert('Confirm Logout', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        onPress: async () => {
+          await AsyncStorage.removeItem('token');
+          navigation.replace('Login');
+        },
+        style: 'destructive',
+      },
+    ]);
+  };
 
   if (loading) {
     return (
@@ -105,8 +149,15 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+    >
       <View style={styles.container}>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Welcome {userName}!</Text>
           <TouchableOpacity onPress={handleLiveStudiesClick} style={styles.liveStudiesContainer}>
@@ -118,17 +169,14 @@ const HomeScreen = ({ navigation }) => {
 
         <View style={styles.dashboard}>
           <Text style={styles.dashboardText}>Devotion Submission Stats</Text>
-
           {submissionData.length > 0 ? (
             <>
-              {/* Adding LinearGradient to PieChart */}
               <Svg height="90" width={screenWidth}>
                 <LinearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
                   <Stop offset="0%" stopColor="#FF5722" stopOpacity="1" />
                   <Stop offset="100%" stopColor="#4CAF50" stopOpacity="1" />
                 </LinearGradient>
               </Svg>
-
               <PieChart
                 data={submissionData}
                 width={screenWidth}
@@ -139,7 +187,6 @@ const HomeScreen = ({ navigation }) => {
                 paddingLeft="10"
                 absolute
               />
-              {/* Display submission stats below the chart */}
               <View style={styles.statsContainer}>
                 {submissionData.map((item, index) => (
                   <Text key={index} style={[styles.statsText, { color: item.color }]}>
@@ -153,9 +200,19 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
 
-        {/* Image Slideshow Section */}
         <View style={styles.imageSlideshowContainer}>
           <Image source={images[currentImageIndex]} style={[styles.imageSlideshow, { width: screenWidth }]} />
+        </View>
+
+        <View style={styles.visionMissionContainer}>
+          <Text style={styles.sectionTitle}>2025 Goals</Text>
+          <Text style={styles.sectionText}>
+            • 23 Bible Study Leaders{'\n'}
+            • 2 New Areas{'\n'}
+            • 300+ Community Members{'\n'}
+            • 20+ Members in 2nd level{'\n'}
+            • 2 New Tuition Areas
+          </Text>
         </View>
 
         <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
@@ -208,6 +265,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#e53935',
+    padding: 10,
+    borderRadius: 5,
+    alignSelf: 'flex-end',
+    marginBottom: 10,
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   header: {
     flexDirection: 'row',
@@ -269,6 +337,52 @@ const styles = StyleSheet.create({
   imageSlideshow: {
     height: 200,
     borderRadius: 10,
+  },
+  visionMissionContainer: {
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: '#e0f7fa',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#00796b',
+    textAlign: 'center',
+  },
+  sectionText: {
+    fontSize: 18,
+    color: '#333',
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  modalContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  studyItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  studyText: {
+    fontSize: 16,
+    marginBottom: 5,
   },
 });
 

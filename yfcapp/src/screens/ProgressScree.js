@@ -20,16 +20,37 @@ const WeeklyStatsScreen = () => {
       return;
     }
 
+    const adjustedStartDate = new Date(startDate);
+    const adjustedEndDate = new Date(endDate);
+
+    const utcStartDate = new Date(Date.UTC(
+      adjustedStartDate.getFullYear(),
+      adjustedStartDate.getMonth(),
+      adjustedStartDate.getDate(),
+      0, 0, 0, 0
+    ));
+
+    const utcEndDate = new Date(Date.UTC(
+      adjustedEndDate.getFullYear(),
+      adjustedEndDate.getMonth(),
+      adjustedEndDate.getDate(),
+      23, 59, 59, 999
+    ));
+
+    console.log("Sending Start Date (UTC):", utcStartDate.toISOString());
+    console.log("Sending End Date (UTC):", utcEndDate.toISOString());
+
     try {
-      const response = await axios.post("http://192.168.8.169:5000/api/progress/stats", {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+      const response = await axios.post("https://yfcapp.onrender.com/api/progress/stats", {
+        startDate: utcStartDate.toISOString(),
+        endDate: utcEndDate.toISOString(),
       });
 
+      console.log("Response Data:", response.data);
       setStats(response.data);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch data. Please try again.");
-      console.error(error);
+      console.error("Error fetching stats:", error);
     }
   };
 
@@ -53,7 +74,6 @@ const WeeklyStatsScreen = () => {
           <Text style={styles.dateButtonText}>📅 Select Start Date</Text>
         </TouchableOpacity>
         <Text style={styles.dateText}>{startDate.toDateString()}</Text>
-
         {showStartDatePicker && (
           <DateTimePicker value={startDate} mode="date" display="default" onChange={onStartDateChange} />
         )}
@@ -63,7 +83,6 @@ const WeeklyStatsScreen = () => {
           <Text style={styles.dateButtonText}>📅 Select End Date</Text>
         </TouchableOpacity>
         <Text style={styles.dateText}>{endDate.toDateString()}</Text>
-
         {showEndDatePicker && (
           <DateTimePicker value={endDate} mode="date" display="default" onChange={onEndDateChange} />
         )}
@@ -75,7 +94,6 @@ const WeeklyStatsScreen = () => {
 
         {stats && (
           <>
-            {/* Display Stats Text */}
             <View style={styles.resultContainer}>
               <Text style={styles.resultText}>📌 Total Uploaded Reports: {stats.totalReports}</Text>
               <Text style={styles.resultText}>📌 Total Devotion Marks: {stats.maxDevotionMarks}</Text>
@@ -87,7 +105,7 @@ const WeeklyStatsScreen = () => {
               <Text style={styles.resultText}>🎯 Team Total: {stats.teamTotalPercentage}%</Text>
             </View>
 
-            {/* Bar Chart - Activity Percentages */}
+            {/* Bar Chart */}
             <Text style={styles.chartTitle}>📊 Activity Percentages</Text>
             <BarChart
               data={{
@@ -103,7 +121,7 @@ const WeeklyStatsScreen = () => {
                   },
                 ],
               }}
-              width={screenWidth - 60} 
+              width={screenWidth - 60}
               height={220}
               yAxisSuffix="%"
               chartConfig={{
@@ -117,7 +135,7 @@ const WeeklyStatsScreen = () => {
               style={styles.chart}
             />
 
-            {/* Pie Chart - Team Total Percentage */}
+            {/* Pie Chart */}
             <Text style={styles.chartTitle}>🥧 Team Total Performance</Text>
             <PieChart
               data={[
@@ -146,6 +164,18 @@ const WeeklyStatsScreen = () => {
               backgroundColor="transparent"
               paddingLeft="15"
             />
+
+            {/* Usernames */}
+            {stats.submittedBy && stats.submittedBy.length > 0 && (
+  <>
+    <Text style={styles.chartTitle}>🧑‍🤝‍🧑 Users Who Submitted Reports</Text>
+    <View style={styles.usernameList}>
+      {stats.submittedBy.map((name, index) => (
+        <Text key={index} style={styles.usernameItem}>🔹 {name}</Text>
+      ))}
+    </View>
+  </>
+)}
           </>
         )}
       </View>
@@ -159,7 +189,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "#f9e3b1",
-   
   },
   dashboard: {
     backgroundColor: "#fff",
@@ -172,7 +201,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
-    marginTop:18
+    marginTop: 18,
   },
   title: {
     fontSize: 22,
@@ -237,6 +266,22 @@ const styles = StyleSheet.create({
   chart: {
     marginVertical: 10,
     borderRadius: 10,
+  },
+  usernameList: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  usernameItem: {
+    fontSize: 15,
+    color: "#555",
+    marginBottom: 4,
   },
 });
 

@@ -17,7 +17,7 @@ const BibleStudyScreen = () => {
     useEffect(() => {
         // Fetch conductors when component mounts
         axios
-            .get('http://192.168.8.169:5000/api/bstudy/conductors') // Replace with your backend URL
+            .get('https://yfcapp.onrender.com/api/bstudy/conductors') // Replace with your backend URL
             .then((response) => {
                 setConductors(response.data);
                 setLoading(false);
@@ -48,7 +48,7 @@ const BibleStudyScreen = () => {
         };
 
         axios
-            .get('http://192.168.8.169:5000/api/bstudy/fetch', { params: filterParams })  // API to fetch studies based on filters
+            .get('https://yfcapp.onrender.com/api/bstudy/fetch', { params: filterParams })  // API to fetch studies based on filters
             .then((response) => {
                 setBibleStudies(response.data);
             })
