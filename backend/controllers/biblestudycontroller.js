@@ -1,4 +1,6 @@
 const BibleStudy = require('../models/biblestudymodel');
+const BibleStudyMember = require("../models/BibleStudyMember");
+const BibleStudyMemberAssigned = require("../models/BibleStudyMemberAssigned");
 
 // Start Bible Study
 const startBibleStudy = async (req, res) => {
@@ -90,5 +92,63 @@ const getBibleStudies = async (req, res) => {
   }
 };
 
+const addMember = async (req, res) => {
+  try {
+    const { name, age, mobile } = req.body;
+    const userId = req.user.id;  // from your auth middleware
+    const username = req.user.name; // assuming token has "name"
 
-module.exports = {startBibleStudy,endBibleStudy,getOngoingBibleStudies,getConductors,getBibleStudies};
+    if (!name || !age || !mobile) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // 1. Create new bible study member
+    const newMember = new BibleStudyMember({ name, age, mobile });
+    await newMember.save();
+
+    // 2. Check if user already has an assignment
+    let assignment = await BibleStudyMemberAssigned.findOne({ userId });
+
+    if (!assignment) {
+      // Create new assignment document
+      assignment = new BibleStudyMemberAssigned({
+        userId,
+        username,
+        members: [newMember._id]
+      });
+    } else {
+      // Add new member to existing list
+      assignment.members.push(newMember._id);
+    }
+
+    await assignment.save();
+
+    return res.status(201).json({
+      message: "Member added and assigned successfully",
+      member: newMember,
+      assigned: assignment
+    });
+  } catch (err) {
+    console.error("Error in addMember:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+// Fetch all members assigned to logged-in user
+const getMyMembers = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const assigned = await BibleStudyMemberAssigned.findOne({ userId }).populate("members");
+
+    if (!assigned) {
+      return res.status(404).json({ message: "No members assigned yet" });
+    }
+
+    res.json(assigned);
+  } catch (err) {
+    console.error("Error in getMyMembers:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+module.exports = {startBibleStudy,endBibleStudy,getOngoingBibleStudies,getConductors,getBibleStudies,addMember,getMyMembers};
