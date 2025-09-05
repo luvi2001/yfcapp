@@ -13,6 +13,8 @@ const noticeRoutes = require('./routes/noticeroutes');
 const mediaRoutes = require('./routes/mediaroutes'); // Ensure this is the correct path
 const progressRoutes = require('./routes/progressroutes'); // Ensure this is the correct path
 const reviewRoutes = require("./routes/reviewRoutes");
+const areviewRoutes = require("./routes/adminreviewRoutes");
+const topicRoutes=require('./routes/topicroutes');
 
 // Middleware
 app.use(express.json({ limit: '100mb' })); 
@@ -44,6 +46,8 @@ app.use('/api/notice', noticeRoutes);
 app.use('/api/media', mediaRoutes); // Ensure media routes are correctly referenced
 app.use('/api/progress', progressRoutes);
 app.use("/api/review", reviewRoutes);
+app.use("/api/areview", areviewRoutes);
+app.use("/api/topics", topicRoutes);
 
 
 // Server listener

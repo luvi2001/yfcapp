@@ -1,4 +1,5 @@
 const ReviewForm = require("../models/ReviewForm");
+const mongoose = require('mongoose');
 
 exports.submitReview = async (req, res) => {
   try {
@@ -62,10 +63,6 @@ exports.submitReview = async (req, res) => {
     if (req.body.disciplerMeeting === "yes") points += 2;
     maxPoints += 2;
 
-    // 6. Giving Contributions
-    if (req.body.contributionPaid === "yes") points += 2;
-    maxPoints += 2;
-
     // Save to DB
     const payload = {
       ...req.body,
@@ -98,3 +95,71 @@ exports.getReviewsByUser = async (req, res) => {
     res.status(500).json({ message: "Error fetching reviews" });
   }
 };
+
+
+exports.getUsersWithReviews = async (req, res) => {
+  try {
+    // Get distinct userIds and populate their names
+    const users = await ReviewForm.aggregate([
+      {
+        $group: {
+          _id: '$userId',
+          userName: { $first: '$userName' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: '$userName',
+        },
+      },
+    ]);
+
+    console.log(users);
+    res.json(users); // [{ _id, name }]
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error fetching users' });
+  }
+};
+
+// Get reviews for a user filtered by month
+exports.getReviewsByUserAndMonth = async (req, res) => {
+  try {
+    let { userName, month, year } = req.query;
+
+    if (!userName || !month || !year) {
+      return res.status(400).json({ message: 'Missing userName, month or year' });
+    }
+
+    // Convert month and year to numbers
+    month = parseInt(month, 10);
+    year = parseInt(year, 10);
+
+    if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+      return res.status(400).json({ message: 'Invalid month or year' });
+    }
+
+    // Start and end of month
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // Fetch reviews and populate member names
+    const reviews = await ReviewForm.find({
+      userName: userName,
+      weekStart: { $gte: startDate, $lte: endDate },
+    })
+      .sort({ weekStart: 1 })
+      .populate({
+        path: 'members.memberId',
+        select: 'name', // Only return the name field
+      });
+
+    res.json(reviews);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error fetching reviews' });
+  }
+};
+
+
