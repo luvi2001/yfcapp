@@ -19,7 +19,7 @@ const getWeeklyStats = async (req, res) => {
       weekEnd: { $lte: end }
     }).limit(50); // optional limit
 
-    const requiredReports = 15; // configurable
+    const requiredReports = 23; // configurable
     const maxDevotionMarks = requiredReports * 7; // max devotion per person (7 days)
 
     let totalDevotionMarks = 0;
