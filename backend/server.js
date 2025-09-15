@@ -15,6 +15,7 @@ const progressRoutes = require('./routes/progressroutes'); // Ensure this is the
 const reviewRoutes = require("./routes/reviewRoutes");
 const areviewRoutes = require("./routes/adminreviewRoutes");
 const topicRoutes=require('./routes/topicroutes');
+const assignedRoutes=require('./routes/assignedMembers')
 
 // Middleware
 app.use(express.json({ limit: '100mb' })); 
@@ -48,6 +49,7 @@ app.use('/api/progress', progressRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/areview", areviewRoutes);
 app.use("/api/topics", topicRoutes);
+app.use("/api/assigned", assignedRoutes);
 
 
 // Server listener
