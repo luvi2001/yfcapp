@@ -20,6 +20,9 @@ import DevotionSearchScreen from './src/screens/DevotionDetails';
 import WeeklyProgressScreen from './src/screens/WeeklyReportScreen';
 import AdminDashboard from './src/screens/ProgressScree';
 import BibleStudyScreen from './src/screens/GetBibleStudyDetails';
+import AddMemberScreen from './src/screens/AddMemberScreen';
+import ReviewFormScreen from './src/screens/ReviewFormScreen';
+import AssignedMembersScreen from './src/screens/AssignedMembersScreen';
 
 // Create the stack navigator
 const Stack = createStackNavigator();
@@ -51,6 +54,9 @@ export default function App() {
         <Stack.Screen name="Progress" component={WeeklyProgressScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Stats" component={AdminDashboard} options={{ headerShown: false }}/>
         <Stack.Screen name="BStudy" component={BibleStudyScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="AddMember" component={AddMemberScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="Review" component={ReviewFormScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="Assigned" component={AssignedMembersScreen} options={{ headerShown: false }}/>
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native'; // ✅ import navigation
 
 const AddBibleStudyScreen = () => {
+  const navigation = useNavigation(); // ✅ hook for navigation
+
   const [conductor, setConductor] = useState('');
   const [location, setLocation] = useState('');
   const [studyId, setStudyId] = useState(null);
@@ -71,6 +74,14 @@ const AddBibleStudyScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* ✅ Top Button for Add Bible Study Member */}
+      <TouchableOpacity
+        style={styles.topButton}
+        onPress={() => navigation.navigate("AddMember")}
+      >
+        <Text style={styles.topButtonText}>➕ Add Bible Study Member</Text>
+      </TouchableOpacity>
+
       <View style={styles.form}>
         {message ? <Text style={styles.message}>{message}</Text> : null}
         <Text style={styles.label}>Conductor Name</Text>
@@ -106,13 +117,23 @@ const AddBibleStudyScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#f9e3b1',
     padding: 20,
   },
+  topButton: {
+    backgroundColor: '#ff0d4f',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  topButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   form: {
-    width: '90%',
+    width: '100%',
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
@@ -121,6 +142,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 5,
     elevation: 5,
+    marginTop:50,
+    marginBottom:50,
   },
   label: {
     fontSize: 16,

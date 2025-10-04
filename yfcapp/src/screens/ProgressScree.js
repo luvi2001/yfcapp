@@ -20,74 +20,46 @@ const WeeklyStatsScreen = () => {
       return;
     }
 
-    const adjustedStartDate = new Date(startDate);
-    const adjustedEndDate = new Date(endDate);
-
-    const utcStartDate = new Date(Date.UTC(
-      adjustedStartDate.getFullYear(),
-      adjustedStartDate.getMonth(),
-      adjustedStartDate.getDate(),
-      0, 0, 0, 0
-    ));
-
-    const utcEndDate = new Date(Date.UTC(
-      adjustedEndDate.getFullYear(),
-      adjustedEndDate.getMonth(),
-      adjustedEndDate.getDate(),
-      23, 59, 59, 999
-    ));
-
-    console.log("Sending Start Date (UTC):", utcStartDate.toISOString());
-    console.log("Sending End Date (UTC):", utcEndDate.toISOString());
-
     try {
       const response = await axios.post("https://yfcapp.onrender.com/api/progress/stats", {
-        startDate: utcStartDate.toISOString(),
-        endDate: utcEndDate.toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
       });
-
-      console.log("Response Data:", response.data);
       setStats(response.data);
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch data. Please try again.");
-      console.error("Error fetching stats:", error);
+      Alert.alert("Error", "Failed to fetch data.");
+      console.error(error);
     }
   };
 
-  const onStartDateChange = (event, selectedDate) => {
-    setShowStartDatePicker(false);
-    if (selectedDate) setStartDate(selectedDate);
-  };
-
-  const onEndDateChange = (event, selectedDate) => {
-    setShowEndDatePicker(false);
-    if (selectedDate) setEndDate(selectedDate);
-  };
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.dashboard}>
+  <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
+    <View style={styles.dashboard}>
         <Text style={styles.title}>📊 Weekly Progress Report</Text>
 
-        {/* Start Date Picker */}
+        {/* Date Pickers */}
         <TouchableOpacity style={styles.dateButton} onPress={() => setShowStartDatePicker(true)}>
           <Text style={styles.dateButtonText}>📅 Select Start Date</Text>
         </TouchableOpacity>
         <Text style={styles.dateText}>{startDate.toDateString()}</Text>
         {showStartDatePicker && (
-          <DateTimePicker value={startDate} mode="date" display="default" onChange={onStartDateChange} />
+          <DateTimePicker value={startDate} mode="date" onChange={(e, d) => {
+            setShowStartDatePicker(false);
+            if (d) setStartDate(d);
+          }} />
         )}
 
-        {/* End Date Picker */}
         <TouchableOpacity style={styles.dateButton} onPress={() => setShowEndDatePicker(true)}>
           <Text style={styles.dateButtonText}>📅 Select End Date</Text>
         </TouchableOpacity>
         <Text style={styles.dateText}>{endDate.toDateString()}</Text>
         {showEndDatePicker && (
-          <DateTimePicker value={endDate} mode="date" display="default" onChange={onEndDateChange} />
+          <DateTimePicker value={endDate} mode="date" onChange={(e, d) => {
+            setShowEndDatePicker(false);
+            if (d) setEndDate(d);
+          }} />
         )}
 
-        {/* Fetch Stats Button */}
         <TouchableOpacity style={styles.button} onPress={fetchWeeklyStats}>
           <Text style={styles.buttonText}>📈 Get Weekly Stats</Text>
         </TouchableOpacity>
@@ -95,13 +67,11 @@ const WeeklyStatsScreen = () => {
         {stats && (
           <>
             <View style={styles.resultContainer}>
-              <Text style={styles.resultText}>📌 Total Uploaded Reports: {stats.totalReports}</Text>
-              <Text style={styles.resultText}>📌 Total Devotion Marks: {stats.maxDevotionMarks}</Text>
-              <Text style={styles.resultText}>🎯 Achieved Devotion Marks: {stats.totalDevotionMarks}</Text>
+              <Text style={styles.resultText}>📌 Total Reports: {stats.totalReports}</Text>
+              <Text style={styles.resultText}>📌 Total Devotion Marks: {stats.totalDevotionMarks}/{stats.maxDevotionMarks}</Text>
               <Text style={styles.resultText}>📖 Devotion: {stats.devotionPercentage}%</Text>
-              <Text style={styles.resultText}>🤝 Met Disciple: {stats.metDisciplePercentage}%</Text>
-              <Text style={styles.resultText}>⛪ Church Attendance: {stats.wentToChurchPercentage}%</Text>
-              <Text style={styles.resultText}>📚 Bible Study: {stats.attendedBibleStudiesPercentage}%</Text>
+              <Text style={styles.resultText}>📚 Bible Study: {stats.bibleStudyPercentage}%</Text>
+              <Text style={styles.resultText}>🤝 Discipler Meeting: {stats.disciplerMeetingPercentage}%</Text>
               <Text style={styles.resultText}>🎯 Team Total: {stats.teamTotalPercentage}%</Text>
             </View>
 
@@ -109,14 +79,13 @@ const WeeklyStatsScreen = () => {
             <Text style={styles.chartTitle}>📊 Activity Percentages</Text>
             <BarChart
               data={{
-                labels: ["Devotion", "Disciple", "Church", "Bible Study"],
+                labels: ["Devotion","Bible Study", "Discipler"],
                 datasets: [
                   {
                     data: [
                       parseFloat(stats.devotionPercentage),
-                      parseFloat(stats.metDisciplePercentage),
-                      parseFloat(stats.wentToChurchPercentage),
-                      parseFloat(stats.attendedBibleStudiesPercentage),
+                      parseFloat(stats.bibleStudyPercentage),
+                      parseFloat(stats.disciplerMeetingPercentage),
                     ],
                   },
                 ],
@@ -125,57 +94,60 @@ const WeeklyStatsScreen = () => {
               height={220}
               yAxisSuffix="%"
               chartConfig={{
-                backgroundColor: "#fff",
                 backgroundGradientFrom: "#0288d1",
-                backgroundGradientTo: "pink",
+                backgroundGradientTo: "#f06292",
                 decimalPlaces: 2,
-                color: (opacity = 1) => `rgba(251, 245, 2, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                color: (opacity = 1) => `rgba(255,255,255,${opacity})`,
+                labelColor: (opacity = 1) => `rgba(255,255,255,${opacity})`,
               }}
               style={styles.chart}
             />
 
             {/* Pie Chart */}
             <Text style={styles.chartTitle}>🥧 Team Total Performance</Text>
-            <PieChart
-              data={[
-                {
-                  name: "Performance",
-                  population: parseFloat(stats.teamTotalPercentage),
-                  color: "#ff0d4f",
-                  legendFontColor: "#333",
-                  legendFontSize: 10,
-                },
-                {
-                  name: "Remaining",
-                  population: 100 - parseFloat(stats.teamTotalPercentage),
-                  color: "#ccc",
-                  legendFontColor: "#333",
-                  legendFontSize: 10,
-                },
-              ]}
-              width={screenWidth - 60}
-              height={220}
-              chartConfig={{
-                backgroundColor: "#fff",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              }}
-              accessor="population"
-              backgroundColor="transparent"
-              paddingLeft="15"
-            />
+<PieChart
+  data={[
+    {
+      name: "Performance",
+      population: parseFloat(stats.teamTotalPercentage),
+      color: "#ff0d4f",
+      legendFontColor: "#333",
+      legendFontSize: 10,
+    },
+    {
+      name: "Remaining",
+      population: 100 - parseFloat(stats.teamTotalPercentage),
+      color: "#ccc",
+      legendFontColor: "#333",
+      legendFontSize: 10,
+    },
+  ]}
+  width={screenWidth - 60}
+  height={220}
+  accessor="population"
+  backgroundColor="transparent"
+  paddingLeft="15"
+  chartConfig={{
+    backgroundColor: "#fff",
+    backgroundGradientFrom: "#fff",
+    backgroundGradientTo: "#fff",
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // 👈 Add this
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  }}
+/>
+
 
             {/* Usernames */}
-            {stats.submittedBy && stats.submittedBy.length > 0 && (
-  <>
-    <Text style={styles.chartTitle}>🧑‍🤝‍🧑 Users Who Submitted Reports</Text>
-    <View style={styles.usernameList}>
-      {stats.submittedBy.map((name, index) => (
-        <Text key={index} style={styles.usernameItem}>🔹 {name}</Text>
-      ))}
-    </View>
-  </>
-)}
+            {stats.submittedBy?.length > 0 && (
+              <>
+                <Text style={styles.chartTitle}>🧑‍🤝‍🧑 Submitted By</Text>
+                <View style={styles.usernameList}>
+                  {stats.submittedBy.map((name, index) => (
+                    <Text key={index} style={styles.usernameItem}>🔹 {name}</Text>
+                  ))}
+                </View>
+              </>
+            )}
           </>
         )}
       </View>
@@ -185,10 +157,10 @@ const WeeklyStatsScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    alignItems: "center",
+    flexGrow: 1,          // 👈 This allows scrollable content
     padding: 20,
     backgroundColor: "#f9e3b1",
+    alignItems: "center", // optional
   },
   dashboard: {
     backgroundColor: "#fff",

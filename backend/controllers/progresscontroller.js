@@ -13,11 +13,11 @@ const getWeeklyStats = async (req, res) => {
     const end = new Date(endDate);
     end.setUTCHours(23, 59, 59, 999);
 
-    // Fetch all reviews between start and end dates
+    console.log(start,end);
     const reports = await Review.find({
       weekStart: { $gte: start },
       weekEnd: { $lte: end }
-    }).limit(50); // optional limit
+    }).limit(50);
 
     const requiredReports = 23; // configurable
     const maxDevotionMarks = requiredReports * 7; // max devotion per person (7 days)

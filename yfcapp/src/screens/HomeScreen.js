@@ -24,6 +24,8 @@ import Svg, { LinearGradient, Stop } from 'react-native-svg';
 import image1 from '../assets/image1.jpg';
 import image2 from '../assets/image2.jpg';
 import image3 from '../assets/image3.jpg';
+import image4 from '../assets/image4.jpg';
+import image5 from '../assets/image5.jpg';
 
 const HomeScreen = ({ navigation }) => {
   const [userName, setUserName] = useState('');
@@ -35,7 +37,7 @@ const HomeScreen = ({ navigation }) => {
   const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width - 40);
   const [refreshing, setRefreshing] = useState(false);
 
-  const images = [image1, image2, image3];
+  const images = [image1, image2, image4,image5,image3,];
 
   useEffect(() => {
     const interval = setInterval(() => {

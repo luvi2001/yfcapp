@@ -6,7 +6,7 @@ import HomeScreen from '../screens/HomeScreen';
 import AddBibleStudyScreen from '../screens/AddBibleStudyScreen';
 import NoticeListScreen from '../screens/NoticeListScreen';
 import RetrieveMedia from '../screens/RetriveMedia';
-import WeeklyProgressScreen from '../screens/WeeklyReportScreen';
+import ReviewFormScreen from '../screens/ReviewFormScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -51,7 +51,7 @@ const BottomTabNavigator = ({ route }) => {
                 iconName = focused ? 'notifications' : 'notifications-sharp'; // Add Food tab
                 break;
 
-            case 'Progress':
+            case 'Review':
                 iconName = focused ? 'hourglass' : 'hourglass-sharp'; // Add Food tab
                 break;
   
@@ -95,8 +95,8 @@ const BottomTabNavigator = ({ route }) => {
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
-        name="Progress" 
-        component={WeeklyProgressScreen} 
+        name="Review" 
+        component={ReviewFormScreen} 
         options={{ headerShown: false }} 
       />
       

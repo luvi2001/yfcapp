@@ -8,6 +8,7 @@ import AdminRetreiveMediScreen from '../screens/AdminRetreiveMediaScreen';
 import DevotionSearchScreen from '../screens/DevotionDetails';
 //import AdminDashboard from '../screens/ProgressScree';
 import BibleStudyScreen from '../screens/GetBibleStudyDetails';
+import AssignedMembersScreen from '../screens/AssignedMembersScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -55,7 +56,9 @@ const BottomTabNavigatorAdmin = ({ route }) => {
             case 'BStudy':
                 iconName = focused ? 'book' : 'book-sharp'; 
                 break;
-  
+             case 'Assigned':
+                iconName = focused ? 'notifications' : 'notifications-sharp'; 
+                break; 
 
           }
 
@@ -101,6 +104,13 @@ const BottomTabNavigatorAdmin = ({ route }) => {
       <Tab.Screen 
         name="BStudy" 
         component={BibleStudyScreen}
+        options={{ headerShown: false }} 
+      
+      />
+
+            <Tab.Screen 
+        name="Assigned" 
+        component={AssignedMembersScreen}
         options={{ headerShown: false }} 
       
       />
