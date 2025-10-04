@@ -3,7 +3,6 @@ const Review = require("../models/ReviewForm"); // Adjust path as needed
 const getWeeklyStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.body;
-    console.log(startDate,endDate);
     if (!startDate || !endDate) {
       return res.status(400).json({ message: "Start date and end date are required." });
     }
@@ -13,11 +12,10 @@ const getWeeklyStats = async (req, res) => {
     const end = new Date(endDate);
     end.setUTCHours(23, 59, 59, 999);
 
-    // Fetch all reviews between start and end dates
     const reports = await Review.find({
       weekStart: { $gte: start },
       weekEnd: { $lte: end }
-    }).limit(50); // optional limit
+    }).limit(50);
 
     const requiredReports = 23; // configurable
     const maxDevotionMarks = requiredReports * 7; // max devotion per person (7 days)
