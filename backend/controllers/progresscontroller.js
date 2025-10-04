@@ -3,7 +3,7 @@ const Review = require("../models/ReviewForm"); // Adjust path as needed
 const getWeeklyStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.body;
-
+    console.log(startDate,endDate);
     if (!startDate || !endDate) {
       return res.status(400).json({ message: "Start date and end date are required." });
     }
