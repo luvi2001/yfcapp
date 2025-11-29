@@ -16,7 +16,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const areviewRoutes = require("./routes/adminreviewRoutes");
 const topicRoutes=require('./routes/topicroutes');
 const assignedRoutes=require('./routes/assignedMembers')
-
+const memberRoutes = require('./routes/memberRoutes');
 // Middleware
 app.use(express.json({ limit: '100mb' })); 
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
@@ -50,6 +50,8 @@ app.use("/api/review", reviewRoutes);
 app.use("/api/areview", areviewRoutes);
 app.use("/api/topics", topicRoutes);
 app.use("/api/assigned", assignedRoutes);
+app.use('/api/members', memberRoutes);
+
 
 
 // Server listener
