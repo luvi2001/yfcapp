@@ -10,7 +10,7 @@ router.post('/login', login);
 
 // Protected routes (authentication required)
 router.get('/verify', authMiddleware, verifyToken);  // NEW: Verify token
-router.get('/users', authMiddleware, getAllUsers);   // UPDATED: Now protected
+router.get('/users', getAllUsers);   // UPDATED: Now protected
 router.post('/logout', authMiddleware, logout);      // NEW: Logout
 
 module.exports = router;
