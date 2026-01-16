@@ -47,20 +47,50 @@ exports.submitReview = async (req, res) => {
       maxPoints += 2;
     }
 
-    // 4. Members’ activities
+    // 4. Members' activities (NEW LOGIC)
+    // If any activity is yes, give 2 points per member. Otherwise 0 points.
     if (Array.isArray(req.body.members)) {
       req.body.members.forEach((m) => {
         if (m.activities) {
-          if (m.activities.biblestudy) points += 2;
-          if (m.activities.discipleship) points += 2;
-          if (m.activities.visiting) points += 2;
+          // Check if at least one activity is true
+          const hasAnyActivity =
+            m.activities.biblestudy ||
+            m.activities.discipleship ||
+            m.activities.visiting;
+
+          if (hasAnyActivity) {
+            points += 2;
+          }
         }
-        maxPoints += 6; // each member max 6
+        maxPoints += 2; // each member max 2 points
       });
     }
 
     // 5. Discipler Meeting
     if (req.body.disciplerMeeting === "yes") points += 2;
+    maxPoints += 2;
+
+    // 6. Contribution (NEW LOGIC)
+    // Check if contribution is paid for this month
+    const reviewMonth = weekStart.getMonth() + 1; // 1-12
+    const reviewYear = weekStart.getFullYear();
+
+    // Check if user has already made a contribution this month
+    const existingContribution = await ReviewForm.findOne({
+      userName: req.body.userName,
+      $expr: {
+        $and: [
+          { $eq: [{ $month: "$weekStart" }, reviewMonth] },
+          { $eq: [{ $year: "$weekStart" }, reviewYear] }
+        ]
+      },
+      contributionPaid: "Yes"
+    });
+
+    // Give 2 points if contributing now OR already contributed this month
+    if (req.body.contributionPaid === "Yes" || existingContribution) {
+      points += 2;
+    }
     maxPoints += 2;
 
     // Save to DB
@@ -81,8 +111,6 @@ exports.submitReview = async (req, res) => {
     res.status(500).json({ message: "Error submitting review" });
   }
 };
-
-
 
 exports.getReviewsByUser = async (req, res) => {
   try {
