@@ -1,12 +1,12 @@
 // controllers/memberController.js
 const ReviewForm = require("../models/ReviewForm");
-const BibleStudyMemberAssigned = require("../models/BibleStudyMemberAssigned");
+const BibleStudyMember = require("../models/BibleStudyMember");
 const mongoose = require('mongoose');
 
 // Get all members
 exports.getAllMembers = async (req, res) => {
   try {
-    const members = await BibleStudyMemberAssigned.find().sort({ name: 1 });
+    const members = await BibleStudyMember.find().sort({ name: 1 });
     console.log('Found members:', members.length);
     res.json(members);
   } catch (err) {
