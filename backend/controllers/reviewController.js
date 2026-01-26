@@ -1,4 +1,5 @@
 const ReviewForm = require("../models/ReviewForm");
+const BibleStudyMemberAssigned  = require("../models/BibleStudyMemberAssigned");
 const mongoose = require('mongoose');
 
 exports.submitReview = async (req, res) => {
@@ -180,14 +181,61 @@ exports.getReviewsByUserAndMonth = async (req, res) => {
       .sort({ weekStart: 1 })
       .populate({
         path: 'members.memberId',
-        select: 'name', // Only return the name field
+        select: 'name',
       });
 
-    res.json(reviews);
+    // Fetch all assigned members for this user
+    const assignedMembers = await BibleStudyMemberAssigned.findOne({ 
+      username: userName 
+    }).populate({
+      path: 'members',
+      select: 'name'
+    });
+
+    if (!assignedMembers) {
+      return res.json(reviews); // Return reviews as-is if no assigned members found
+    }
+
+    // Enhance reviews with complete member list
+    const enhancedReviews = reviews.map(review => {
+      const reviewObj = review.toObject();
+      
+      // Create a map of attended members from the review
+      const attendedMembersMap = new Map(
+        reviewObj.members.map(m => [
+          m.memberId._id.toString(), 
+          m.activities
+        ])
+      );
+
+      // Build complete members array with all assigned members
+      const completeMembers = assignedMembers.members.map(member => {
+        const memberId = member._id.toString();
+        const attended = attendedMembersMap.get(memberId);
+        
+        return {
+          memberId: {
+            _id: member._id,
+            name: member.name
+          },
+          activities: attended || {
+            biblestudy: false,
+            discipleship: false,
+            visiting: false
+          }
+        };
+      });
+
+      return {
+        ...reviewObj,
+        members: completeMembers
+      };
+    });
+
+    res.json(enhancedReviews);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error fetching reviews' });
   }
 };
-
 
