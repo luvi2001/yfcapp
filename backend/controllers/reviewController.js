@@ -157,8 +157,8 @@ exports.getReviewsByUserAndMonth = async (req, res) => {
   try {
     let { userName, month, year } = req.query;
 
-    if (!userName || !month || !year) {
-      return res.status(400).json({ message: 'Missing userName, month or year' });
+    if (!month || !year) {
+      return res.status(400).json({ message: 'Missing month or year' });
     }
 
     // Convert month and year to numbers
@@ -173,16 +173,23 @@ exports.getReviewsByUserAndMonth = async (req, res) => {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
-    // Fetch reviews and populate member names
-    const reviews = await ReviewForm.find({
-      userName: userName,
-      weekStart: { $gte: startDate, $lte: endDate },
-    })
+    const query = { weekStart: { $gte: startDate, $lte: endDate } };
+    if (userName && userName !== 'all') {
+      query.userName = userName;
+    }
+
+    // Fetch reviews and populate member names. The explicit "all" mode is
+    // used by the admin report and leaves the existing user filter unchanged.
+    const reviews = await ReviewForm.find(query)
       .sort({ weekStart: 1 })
       .populate({
         path: 'members.memberId',
         select: 'name',
       });
+
+    if (!userName || userName === 'all') {
+      return res.json(reviews);
+    }
 
     // Fetch all assigned members for this user
     const assignedMembers = await BibleStudyMemberAssigned.findOne({ 
